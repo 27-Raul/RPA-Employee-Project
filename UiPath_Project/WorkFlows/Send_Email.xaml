@@ -1,0 +1,193 @@
+<Activity mc:Ignorable="sap sap2010" x:Class="Send_Email" xmlns="http://schemas.microsoft.com/netfx/2009/xaml/activities" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:s="clr-namespace:System;assembly=System.Private.CoreLib" xmlns:sap="http://schemas.microsoft.com/netfx/2009/xaml/activities/presentation" xmlns:sap2010="http://schemas.microsoft.com/netfx/2010/xaml/activities/presentation" xmlns:scg="clr-namespace:System.Collections.Generic;assembly=System.Private.CoreLib" xmlns:ui="http://schemas.uipath.com/workflow/activities" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <x:Members>
+    <x:Property Name="in_Config" Type="InArgument(scg:Dictionary(x:String, x:String))" />
+    <x:Property Name="in_EmployeeData" Type="InArgument(scg:Dictionary(x:String, x:String))" />
+    <x:Property Name="in_EmployeeID" Type="InArgument(x:String)" />
+    <x:Property Name="in_AttachmentPath" Type="InArgument(x:String)" />
+    <x:Property Name="out_Success" Type="OutArgument(x:Boolean)" />
+    <x:Property Name="out_EmailMode" Type="OutArgument(x:String)" />
+  </x:Members>
+  <VisualBasic.Settings>
+    <x:Null />
+  </VisualBasic.Settings>
+  <sap2010:WorkflowViewState.IdRef>Send_Email_1</sap2010:WorkflowViewState.IdRef>
+  <TextExpression.NamespacesForImplementation>
+    <scg:List x:TypeArguments="x:String" Capacity="34">
+      <x:String>GlobalConstantsNamespace</x:String>
+      <x:String>GlobalVariablesNamespace</x:String>
+      <x:String>Microsoft.VisualBasic</x:String>
+      <x:String>Microsoft.VisualBasic.Activities</x:String>
+      <x:String>System</x:String>
+      <x:String>System.Activities</x:String>
+      <x:String>System.Activities.Statements</x:String>
+      <x:String>System.Collections</x:String>
+      <x:String>System.Collections.Generic</x:String>
+      <x:String>System.Collections.ObjectModel</x:String>
+      <x:String>System.IO</x:String>
+      <x:String>System.Linq</x:String>
+      <x:String>UiPath.Core</x:String>
+      <x:String>UiPath.Core.Activities</x:String>
+      <x:String>UiPath.Mail.Activities</x:String>
+      <x:String>UiPath.Mail.SMTP.Activities</x:String>
+      <x:String>UiPath.Platform.ResourceHandling</x:String>
+    </scg:List>
+  </TextExpression.NamespacesForImplementation>
+  <TextExpression.ReferencesForImplementation>
+    <scg:List x:TypeArguments="AssemblyReference" Capacity="34">
+      <AssemblyReference>System.Activities</AssemblyReference>
+      <AssemblyReference>Microsoft.VisualBasic</AssemblyReference>
+      <AssemblyReference>Microsoft.VisualBasic.Core</AssemblyReference>
+      <AssemblyReference>System.Private.CoreLib</AssemblyReference>
+      <AssemblyReference>System</AssemblyReference>
+      <AssemblyReference>UiPath.System.Activities</AssemblyReference>
+      <AssemblyReference>UiPath.Mail.Activities</AssemblyReference>
+      <AssemblyReference>UiPath.Platform</AssemblyReference>
+      <AssemblyReference>System.Linq</AssemblyReference>
+      <AssemblyReference>System.ObjectModel</AssemblyReference>
+      <AssemblyReference>System.ComponentModel.TypeConverter</AssemblyReference>
+    </scg:List>
+  </TextExpression.ReferencesForImplementation>
+  <Sequence DisplayName="Send_Email" sap2010:WorkflowViewState.IdRef="Sequence_1">
+    <Sequence.Variables>
+      <Variable x:TypeArguments="x:String" Name="emailMode" />
+      <Variable x:TypeArguments="x:String" Name="subject" />
+      <Variable x:TypeArguments="x:String" Name="body" />
+      <Variable x:TypeArguments="x:String" Name="company" />
+    </Sequence.Variables>
+    <sap:WorkflowViewStateService.ViewState>
+      <scg:Dictionary x:TypeArguments="x:String, x:Object">
+        <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+      </scg:Dictionary>
+    </sap:WorkflowViewStateService.ViewState>
+    <Assign sap2010:WorkflowViewState.IdRef="Assign_1">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[emailMode]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[If(in_Config.ContainsKey("EmailMode"), in_Config("EmailMode").ToLower(), "mock")]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <Assign sap2010:WorkflowViewState.IdRef="Assign_2">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[out_EmailMode]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[emailMode]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <Assign sap2010:WorkflowViewState.IdRef="Assign_3">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[company]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[If(in_Config.ContainsKey("CompanyName"), in_Config("CompanyName"), "ABC Technologies")]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <Assign sap2010:WorkflowViewState.IdRef="Assign_4">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[subject]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">["Welcome to " + company + " - " + in_EmployeeID]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <Assign sap2010:WorkflowViewState.IdRef="Assign_5">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[body]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">[String.Format("Hello {0},{1}{1}Welcome to {2}! We are thrilled to have you join us as {3}.{1}{1}Your Employee ID is: {4}{1}Department: {5}{1}Reporting Manager: {6}{1}{1}Attached is your official Welcome Letter.{1}{1}Best regards,{1}HR Operations Team", in_EmployeeData("full_name"), Environment.NewLine, company, in_EmployeeData("designation"), in_EmployeeID, in_EmployeeData("department"), If(in_EmployeeData.ContainsKey("manager_name"), in_EmployeeData("manager_name"), "HR Team"))]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <If Condition="[emailMode = &quot;smtp&quot;]" DisplayName="Check Email Mode" sap2010:WorkflowViewState.IdRef="If_1">
+      <If.Then>
+        <TryCatch DisplayName="Try SMTP Send" sap2010:WorkflowViewState.IdRef="TryCatch_1">
+          <TryCatch.Try>
+            <Sequence DisplayName="Send SMTP" sap2010:WorkflowViewState.IdRef="Sequence_2">
+              <ui:SendMail Bcc="{x:Null}" Cc="{x:Null}" ContinueOnError="{x:Null}" From="{x:Null}" MailMessage="{x:Null}" Name="{x:Null}" ReplyTo="{x:Null}" Result="{x:Null}" SecurePassword="{x:Null}" TimeoutMS="{x:Null}" UseOAuth="{x:Null}" Body="[body]" DisplayName="Send SMTP Mail Message" Email="[in_Config(&quot;SenderEmail&quot;)]" EnableSSL="True" sap2010:WorkflowViewState.IdRef="SendMail_1" IgnoreCRL="False" IsBodyHtml="False" Password="[in_Config(&quot;SenderPassword&quot;)]" Port="[Convert.ToInt32(in_Config(&quot;SMTPPort&quot;))]" SecureConnection="Auto" Server="[in_Config(&quot;SMTPServer&quot;)]" Subject="[subject]" To="[in_EmployeeData(&quot;email&quot;)]">
+                <ui:SendMail.Files>
+                  <scg:List x:TypeArguments="InArgument(x:String)" Capacity="4">
+                    <InArgument x:TypeArguments="x:String">[in_AttachmentPath]</InArgument>
+                  </scg:List>
+                </ui:SendMail.Files>
+              </ui:SendMail>
+              <Assign sap2010:WorkflowViewState.IdRef="Assign_6">
+                <Assign.To>
+                  <OutArgument x:TypeArguments="x:Boolean">[out_Success]</OutArgument>
+                </Assign.To>
+                <Assign.Value>
+                  <InArgument x:TypeArguments="x:Boolean">[True]</InArgument>
+                </Assign.Value>
+              </Assign>
+              <ui:LogMessage DisplayName="Log Email Sent" sap2010:WorkflowViewState.IdRef="LogMessage_1" Level="Info" Message="[&quot;SMTP Email successfully sent to &quot; + in_EmployeeData(&quot;email&quot;)]" />
+            </Sequence>
+          </TryCatch.Try>
+          <TryCatch.Catches>
+            <Catch x:TypeArguments="s:Exception" sap2010:WorkflowViewState.IdRef="Catch`1_1">
+              <ActivityAction x:TypeArguments="s:Exception">
+                <ActivityAction.Argument>
+                  <DelegateInArgument x:TypeArguments="s:Exception" Name="ex" />
+                </ActivityAction.Argument>
+                <Sequence DisplayName="Fallback to Mock" sap2010:WorkflowViewState.IdRef="Sequence_3">
+                  <Assign sap2010:WorkflowViewState.IdRef="Assign_7">
+                    <Assign.To>
+                      <OutArgument x:TypeArguments="x:Boolean">[out_Success]</OutArgument>
+                    </Assign.To>
+                    <Assign.Value>
+                      <InArgument x:TypeArguments="x:Boolean">[False]</InArgument>
+                    </Assign.Value>
+                  </Assign>
+                  <ui:LogMessage DisplayName="Log SMTP Error" sap2010:WorkflowViewState.IdRef="LogMessage_2" Level="Warn" Message="[&quot;SMTP send failed: &quot; + ex.Message + &quot;. Writing mock log.&quot;]" />
+                </Sequence>
+              </ActivityAction>
+            </Catch>
+          </TryCatch.Catches>
+        </TryCatch>
+      </If.Then>
+      <If.Else>
+        <Sequence DisplayName="Mock Email Flow" sap2010:WorkflowViewState.IdRef="Sequence_4">
+          <Sequence.Variables>
+            <Variable x:TypeArguments="x:String" Name="mockDir" />
+            <Variable x:TypeArguments="x:String" Name="mockFile" />
+            <Variable x:TypeArguments="x:String" Name="mockContent" />
+          </Sequence.Variables>
+          <Assign sap2010:WorkflowViewState.IdRef="Assign_8">
+            <Assign.To>
+              <OutArgument x:TypeArguments="x:String">[mockDir]</OutArgument>
+            </Assign.To>
+            <Assign.Value>
+              <InArgument x:TypeArguments="x:String">["Logs/MockEmails"]</InArgument>
+            </Assign.Value>
+          </Assign>
+          <ui:CreateDirectory ContinueOnError="{x:Null}" Output="{x:Null}" DisplayName="Ensure Mock Folder" sap2010:WorkflowViewState.IdRef="CreateDirectory_1" Path="[mockDir]" />
+          <Assign sap2010:WorkflowViewState.IdRef="Assign_9">
+            <Assign.To>
+              <OutArgument x:TypeArguments="x:String">[mockFile]</OutArgument>
+            </Assign.To>
+            <Assign.Value>
+              <InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(mockDir, "Email_" + in_EmployeeID + "_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".txt")]</InArgument>
+            </Assign.Value>
+          </Assign>
+          <Assign sap2010:WorkflowViewState.IdRef="Assign_10">
+            <Assign.To>
+              <OutArgument x:TypeArguments="x:String">[mockContent]</OutArgument>
+            </Assign.To>
+            <Assign.Value>
+              <InArgument x:TypeArguments="x:String">[String.Format("============================================================{0} MOCK EMAIL TRANSMISSION LOG{0}============================================================{0}Timestamp : {1}{0}To : {2}{0}Subject : {3}{0}Attachment : {4}{0}------------------------------------------------------------{0}BODY:{0}{5}{0}============================================================", Environment.NewLine, DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), in_EmployeeData("email"), subject, in_AttachmentPath, body)]</InArgument>
+            </Assign.Value>
+          </Assign>
+          <ui:WriteTextFile File="{x:Null}" DisplayName="Write Mock Email File" FileName="[mockFile]" sap2010:WorkflowViewState.IdRef="WriteTextFile_1" Text="[mockContent]" />
+          <Assign sap2010:WorkflowViewState.IdRef="Assign_11">
+            <Assign.To>
+              <OutArgument x:TypeArguments="x:Boolean">[out_Success]</OutArgument>
+            </Assign.To>
+            <Assign.Value>
+              <InArgument x:TypeArguments="x:Boolean">[True]</InArgument>
+            </Assign.Value>
+          </Assign>
+          <ui:LogMessage DisplayName="Log Mock Email" sap2010:WorkflowViewState.IdRef="LogMessage_3" Level="Info" Message="[&quot;Mock email saved to &quot; + mockFile]" />
+        </Sequence>
+      </If.Else>
+    </If>
+  </Sequence>
+</Activity>

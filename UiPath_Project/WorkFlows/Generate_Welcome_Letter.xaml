@@ -1,0 +1,98 @@
+<Activity mc:Ignorable="sap sap2010" x:Class="Generate_Welcome_Letter" xmlns="http://schemas.microsoft.com/netfx/2009/xaml/activities" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:s="clr-namespace:System;assembly=System.Private.CoreLib" xmlns:sap="http://schemas.microsoft.com/netfx/2009/xaml/activities/presentation" xmlns:sap2010="http://schemas.microsoft.com/netfx/2010/xaml/activities/presentation" xmlns:scg="clr-namespace:System.Collections.Generic;assembly=System.Private.CoreLib" xmlns:ui="http://schemas.uipath.com/workflow/activities" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <x:Members>
+    <x:Property Name="in_EmployeeData" Type="InArgument(scg:Dictionary(x:String, x:String))" />
+    <x:Property Name="in_EmployeeID" Type="InArgument(x:String)" />
+    <x:Property Name="in_EmployeeFolder" Type="InArgument(x:String)" />
+    <x:Property Name="in_CompanyName" Type="InArgument(x:String)" />
+    <x:Property Name="out_WelcomeLetterPath" Type="OutArgument(x:String)" />
+    <x:Property Name="out_Success" Type="OutArgument(x:Boolean)" />
+  </x:Members>
+  <VisualBasic.Settings>
+    <x:Null />
+  </VisualBasic.Settings>
+  <sap2010:WorkflowViewState.IdRef>Generate_Welcome_Letter_1</sap2010:WorkflowViewState.IdRef>
+  <TextExpression.NamespacesForImplementation>
+    <scg:List x:TypeArguments="x:String" Capacity="34">
+      <x:String>GlobalConstantsNamespace</x:String>
+      <x:String>GlobalVariablesNamespace</x:String>
+      <x:String>Microsoft.VisualBasic</x:String>
+      <x:String>Microsoft.VisualBasic.Activities</x:String>
+      <x:String>System.Activities</x:String>
+      <x:String>System.Activities.Statements</x:String>
+      <x:String>System</x:String>
+      <x:String>System.Collections</x:String>
+      <x:String>System.Collections.Generic</x:String>
+      <x:String>System.IO</x:String>
+      <x:String>UiPath.Core</x:String>
+      <x:String>UiPath.Core.Activities</x:String>
+      <x:String>UiPath.Platform.ResourceHandling</x:String>
+    </scg:List>
+  </TextExpression.NamespacesForImplementation>
+  <TextExpression.ReferencesForImplementation>
+    <scg:List x:TypeArguments="AssemblyReference" Capacity="34">
+      <AssemblyReference>System.Activities</AssemblyReference>
+      <AssemblyReference>Microsoft.VisualBasic</AssemblyReference>
+      <AssemblyReference>Microsoft.VisualBasic.Core</AssemblyReference>
+      <AssemblyReference>System.Private.CoreLib</AssemblyReference>
+      <AssemblyReference>System</AssemblyReference>
+      <AssemblyReference>UiPath.System.Activities</AssemblyReference>
+      <AssemblyReference>UiPath.Platform</AssemblyReference>
+    </scg:List>
+  </TextExpression.ReferencesForImplementation>
+  <Sequence DisplayName="Generate_Welcome_Letter" sap2010:WorkflowViewState.IdRef="Sequence_1">
+    <Sequence.Variables>
+      <Variable x:TypeArguments="x:String" Name="letterContent" />
+      <Variable x:TypeArguments="x:String" Name="targetDir" />
+      <Variable x:TypeArguments="x:String" Name="company" />
+    </Sequence.Variables>
+    <TryCatch DisplayName="Try Generate Welcome Letter" sap2010:WorkflowViewState.IdRef="TryCatch_1">
+      <TryCatch.Try>
+        <Sequence DisplayName="Build Letter" sap2010:WorkflowViewState.IdRef="Sequence_2">
+          <Assign sap2010:WorkflowViewState.IdRef="Assign_1">
+            <Assign.To><OutArgument x:TypeArguments="x:String">[company]</OutArgument></Assign.To>
+            <Assign.Value><InArgument x:TypeArguments="x:String">[If(String.IsNullOrEmpty(in_CompanyName), "ABC Technologies", in_CompanyName)]</InArgument></Assign.Value>
+          </Assign>
+          <Assign sap2010:WorkflowViewState.IdRef="Assign_2">
+            <Assign.To><OutArgument x:TypeArguments="x:String">[targetDir]</OutArgument></Assign.To>
+            <Assign.Value><InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(in_EmployeeFolder, "Generated_Documents\Welcome_Letter")]</InArgument></Assign.Value>
+          </Assign>
+          <Assign sap2010:WorkflowViewState.IdRef="Assign_3">
+            <Assign.To><OutArgument x:TypeArguments="x:String">[out_WelcomeLetterPath]</OutArgument></Assign.To>
+            <Assign.Value><InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(targetDir, "Welcome_Letter_" + in_EmployeeID + ".txt")]</InArgument></Assign.Value>
+          </Assign>
+          
+          <Assign sap2010:WorkflowViewState.IdRef="Assign_4">
+            <Assign.To><OutArgument x:TypeArguments="x:String">[letterContent]</OutArgument></Assign.To>
+            <Assign.Value>
+              <InArgument x:TypeArguments="x:String">[String.Format("============================================================{0}                {1}{0}         OFFICIAL EMPLOYMENT OFFER &amp; WELCOME LETTER{0}============================================================{0}Date: {2}{0}Reference: HR/OB/{3}/{4}{0}{0}Dear {5},{0}{0}We are pleased to welcome you to {6}! We are excited to{0}confirm your appointment as {7} in the {8} Department.{0}{0}------------------------------------------------------------{0}EMPLOYEE ONBOARDING DETAILS:{0}------------------------------------------------------------{0}Employee ID     : {3}{0}Full Name       : {5}{0}Department      : {8}{0}Designation     : {7}{0}Employment Type : {9}{0}Email Address   : {10}{0}Reporting To    : {11}{0}------------------------------------------------------------{0}{0}Please review and retain this document for your personal records.{0}{0}Sincerely,{0}Human Resources Department{0}{6}", Environment.NewLine, company.ToUpper(), DateTime.Now.ToString("dd MMMM yyyy"), in_EmployeeID, DateTime.Now.Year.ToString(), in_EmployeeData("full_name"), company, in_EmployeeData("designation"), in_EmployeeData("department"), in_EmployeeData("employment_type"), in_EmployeeData("email"), If(in_EmployeeData.ContainsKey("manager_name"), in_EmployeeData("manager_name"), "HR Department"))]</InArgument>
+            </Assign.Value>
+          </Assign>
+
+          <ui:WriteTextFile File="{x:Null}" DisplayName="Write Welcome Letter Text" FileName="[out_WelcomeLetterPath]" Text="[letterContent]" sap2010:WorkflowViewState.IdRef="WriteTextFile_1" />
+          
+          <Assign sap2010:WorkflowViewState.IdRef="Assign_5">
+            <Assign.To><OutArgument x:TypeArguments="x:Boolean">[out_Success]</OutArgument></Assign.To>
+            <Assign.Value><InArgument x:TypeArguments="x:Boolean">[True]</InArgument></Assign.Value>
+          </Assign>
+          <ui:LogMessage DisplayName="Log Welcome Letter Created" Level="Info" Message="[&quot;Welcome letter generated at: &quot; + out_WelcomeLetterPath]" sap2010:WorkflowViewState.IdRef="LogMessage_1" />
+        </Sequence>
+      </TryCatch.Try>
+      <TryCatch.Catches>
+        <Catch x:TypeArguments="s:Exception" sap2010:WorkflowViewState.IdRef="Catch`1_1">
+          <ActivityAction x:TypeArguments="s:Exception">
+            <ActivityAction.Argument>
+              <DelegateInArgument x:TypeArguments="s:Exception" Name="ex" />
+            </ActivityAction.Argument>
+            <Sequence DisplayName="Handle Error" sap2010:WorkflowViewState.IdRef="Sequence_3">
+              <Assign sap2010:WorkflowViewState.IdRef="Assign_6">
+                <Assign.To><OutArgument x:TypeArguments="x:Boolean">[out_Success]</OutArgument></Assign.To>
+                <Assign.Value><InArgument x:TypeArguments="x:Boolean">[False]</InArgument></Assign.Value>
+              </Assign>
+              <ui:LogMessage DisplayName="Log Letter Error" Level="Error" Message="[&quot;Failed to generate welcome letter: &quot; + ex.Message]" sap2010:WorkflowViewState.IdRef="LogMessage_2" />
+            </Sequence>
+          </ActivityAction>
+        </Catch>
+      </TryCatch.Catches>
+    </TryCatch>
+  </Sequence>
+</Activity>

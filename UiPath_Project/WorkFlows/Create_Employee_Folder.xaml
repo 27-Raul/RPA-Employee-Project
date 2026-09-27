@@ -1,0 +1,93 @@
+<Activity mc:Ignorable="sap sap2010" x:Class="Create_Employee_Folder" xmlns="http://schemas.microsoft.com/netfx/2009/xaml/activities" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:s="clr-namespace:System;assembly=System.Private.CoreLib" xmlns:sap="http://schemas.microsoft.com/netfx/2009/xaml/activities/presentation" xmlns:sap2010="http://schemas.microsoft.com/netfx/2010/xaml/activities/presentation" xmlns:scg="clr-namespace:System.Collections.Generic;assembly=System.Private.CoreLib" xmlns:ui="http://schemas.uipath.com/workflow/activities" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <x:Members>
+    <x:Property Name="in_EmployeeRootFolder" Type="InArgument(x:String)" />
+    <x:Property Name="in_EmployeeID" Type="InArgument(x:String)" />
+    <x:Property Name="in_FullName" Type="InArgument(x:String)" />
+    <x:Property Name="out_EmployeeFolderPath" Type="OutArgument(x:String)" />
+    <x:Property Name="out_Success" Type="OutArgument(x:Boolean)" />
+  </x:Members>
+  <VisualBasic.Settings>
+    <x:Null />
+  </VisualBasic.Settings>
+  <sap2010:WorkflowViewState.IdRef>Create_Employee_Folder_1</sap2010:WorkflowViewState.IdRef>
+  <TextExpression.NamespacesForImplementation>
+    <scg:List x:TypeArguments="x:String" Capacity="34">
+      <x:String>GlobalConstantsNamespace</x:String>
+      <x:String>GlobalVariablesNamespace</x:String>
+      <x:String>Microsoft.VisualBasic</x:String>
+      <x:String>Microsoft.VisualBasic.Activities</x:String>
+      <x:String>System.Activities</x:String>
+      <x:String>System.Activities.Statements</x:String>
+      <x:String>System</x:String>
+      <x:String>System.Collections</x:String>
+      <x:String>System.Collections.Generic</x:String>
+      <x:String>System.IO</x:String>
+      <x:String>UiPath.Core</x:String>
+      <x:String>UiPath.Core.Activities</x:String>
+      <x:String>UiPath.Platform.ResourceHandling</x:String>
+    </scg:List>
+  </TextExpression.NamespacesForImplementation>
+  <TextExpression.ReferencesForImplementation>
+    <scg:List x:TypeArguments="AssemblyReference" Capacity="34">
+      <AssemblyReference>System.Activities</AssemblyReference>
+      <AssemblyReference>Microsoft.VisualBasic</AssemblyReference>
+      <AssemblyReference>Microsoft.VisualBasic.Core</AssemblyReference>
+      <AssemblyReference>System.Private.CoreLib</AssemblyReference>
+      <AssemblyReference>System</AssemblyReference>
+      <AssemblyReference>UiPath.System.Activities</AssemblyReference>
+      <AssemblyReference>UiPath.Platform</AssemblyReference>
+    </scg:List>
+  </TextExpression.ReferencesForImplementation>
+  <Sequence DisplayName="Create_Employee_Folder" sap2010:WorkflowViewState.IdRef="Sequence_1">
+    <Sequence.Variables>
+      <Variable x:TypeArguments="x:String" Name="safeName" />
+      <Variable x:TypeArguments="x:String" Name="folderName" />
+    </Sequence.Variables>
+    <TryCatch DisplayName="Try Create Folder Structure" sap2010:WorkflowViewState.IdRef="TryCatch_1">
+      <TryCatch.Try>
+        <Sequence DisplayName="Create Directories" sap2010:WorkflowViewState.IdRef="Sequence_2">
+          <Assign sap2010:WorkflowViewState.IdRef="Assign_1">
+            <Assign.To><OutArgument x:TypeArguments="x:String">[safeName]</OutArgument></Assign.To>
+            <Assign.Value><InArgument x:TypeArguments="x:String">[in_FullName.Replace(" ", "_").Replace("/", "_").Replace("\", "_")]</InArgument></Assign.Value>
+          </Assign>
+          <Assign sap2010:WorkflowViewState.IdRef="Assign_2">
+            <Assign.To><OutArgument x:TypeArguments="x:String">[folderName]</OutArgument></Assign.To>
+            <Assign.Value><InArgument x:TypeArguments="x:String">[in_EmployeeID + "_" + safeName]</InArgument></Assign.Value>
+          </Assign>
+          <Assign sap2010:WorkflowViewState.IdRef="Assign_3">
+            <Assign.To><OutArgument x:TypeArguments="x:String">[out_EmployeeFolderPath]</OutArgument></Assign.To>
+            <Assign.Value><InArgument x:TypeArguments="x:String">[System.IO.Path.Combine(in_EmployeeRootFolder, folderName)]</InArgument></Assign.Value>
+          </Assign>
+          
+          <ui:CreateDirectory ContinueOnError="{x:Null}" Output="{x:Null}" DisplayName="Create Main Folder" Path="[out_EmployeeFolderPath]" sap2010:WorkflowViewState.IdRef="CreateDirectory_1" />
+          <ui:CreateDirectory ContinueOnError="{x:Null}" Output="{x:Null}" DisplayName="Create Personal Docs" Path="[System.IO.Path.Combine(out_EmployeeFolderPath, &quot;Personal_Documents&quot;)]" sap2010:WorkflowViewState.IdRef="CreateDirectory_2" />
+          <ui:CreateDirectory ContinueOnError="{x:Null}" Output="{x:Null}" DisplayName="Create Employment Docs" Path="[System.IO.Path.Combine(out_EmployeeFolderPath, &quot;Employment_Documents&quot;)]" sap2010:WorkflowViewState.IdRef="CreateDirectory_3" />
+          <ui:CreateDirectory ContinueOnError="{x:Null}" Output="{x:Null}" DisplayName="Create Welcome Letter Folder" Path="[System.IO.Path.Combine(out_EmployeeFolderPath, &quot;Generated_Documents\Welcome_Letter&quot;)]" sap2010:WorkflowViewState.IdRef="CreateDirectory_4" />
+          <ui:CreateDirectory ContinueOnError="{x:Null}" Output="{x:Null}" DisplayName="Create ID Card Folder" Path="[System.IO.Path.Combine(out_EmployeeFolderPath, &quot;Generated_Documents\ID_Card&quot;)]" sap2010:WorkflowViewState.IdRef="CreateDirectory_5" />
+          
+          <Assign sap2010:WorkflowViewState.IdRef="Assign_4">
+            <Assign.To><OutArgument x:TypeArguments="x:Boolean">[out_Success]</OutArgument></Assign.To>
+            <Assign.Value><InArgument x:TypeArguments="x:Boolean">[True]</InArgument></Assign.Value>
+          </Assign>
+          <ui:LogMessage DisplayName="Log Folder Creation" Level="Info" Message="[&quot;Employee directory created at: &quot; + out_EmployeeFolderPath]" sap2010:WorkflowViewState.IdRef="LogMessage_1" />
+        </Sequence>
+      </TryCatch.Try>
+      <TryCatch.Catches>
+        <Catch x:TypeArguments="s:Exception" sap2010:WorkflowViewState.IdRef="Catch`1_1">
+          <ActivityAction x:TypeArguments="s:Exception">
+            <ActivityAction.Argument>
+              <DelegateInArgument x:TypeArguments="s:Exception" Name="ex" />
+            </ActivityAction.Argument>
+            <Sequence DisplayName="Handle Error" sap2010:WorkflowViewState.IdRef="Sequence_3">
+              <Assign sap2010:WorkflowViewState.IdRef="Assign_5">
+                <Assign.To><OutArgument x:TypeArguments="x:Boolean">[out_Success]</OutArgument></Assign.To>
+                <Assign.Value><InArgument x:TypeArguments="x:Boolean">[False]</InArgument></Assign.Value>
+              </Assign>
+              <ui:LogMessage DisplayName="Log Folder Error" Level="Error" Message="[&quot;Failed to create folder: &quot; + ex.Message]" sap2010:WorkflowViewState.IdRef="LogMessage_2" />
+            </Sequence>
+          </ActivityAction>
+        </Catch>
+      </TryCatch.Catches>
+    </TryCatch>
+  </Sequence>
+</Activity>

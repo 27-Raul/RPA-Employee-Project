@@ -1,0 +1,91 @@
+<Activity mc:Ignorable="sap sap2010" x:Class="Validate_Data" xmlns="http://schemas.microsoft.com/netfx/2009/xaml/activities" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:s="clr-namespace:System;assembly=System.Private.CoreLib" xmlns:sap="http://schemas.microsoft.com/netfx/2009/xaml/activities/presentation" xmlns:sap2010="http://schemas.microsoft.com/netfx/2010/xaml/activities/presentation" xmlns:scg="clr-namespace:System.Collections.Generic;assembly=System.Private.CoreLib" xmlns:ui="http://schemas.uipath.com/workflow/activities" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <x:Members>
+    <x:Property Name="in_EmployeeData" Type="InArgument(scg:Dictionary(x:String, x:String))" />
+    <x:Property Name="out_IsValid" Type="OutArgument(x:Boolean)" />
+    <x:Property Name="out_Errors" Type="OutArgument(scg:List(x:String))" />
+  </x:Members>
+  <VisualBasic.Settings>
+    <x:Null />
+  </VisualBasic.Settings>
+  <sap2010:WorkflowViewState.IdRef>Validate_Data_1</sap2010:WorkflowViewState.IdRef>
+  <TextExpression.NamespacesForImplementation>
+    <scg:List x:TypeArguments="x:String" Capacity="34">
+      <x:String>GlobalConstantsNamespace</x:String>
+      <x:String>GlobalVariablesNamespace</x:String>
+      <x:String>Microsoft.VisualBasic</x:String>
+      <x:String>Microsoft.VisualBasic.Activities</x:String>
+      <x:String>System.Activities</x:String>
+      <x:String>System.Activities.Statements</x:String>
+      <x:String>System</x:String>
+      <x:String>System.Collections</x:String>
+      <x:String>System.Collections.Generic</x:String>
+      <x:String>System.Text.RegularExpressions</x:String>
+      <x:String>UiPath.Core</x:String>
+      <x:String>UiPath.Core.Activities</x:String>
+    </scg:List>
+  </TextExpression.NamespacesForImplementation>
+  <TextExpression.ReferencesForImplementation>
+    <scg:List x:TypeArguments="AssemblyReference" Capacity="34">
+      <AssemblyReference>System.Activities</AssemblyReference>
+      <AssemblyReference>Microsoft.VisualBasic</AssemblyReference>
+      <AssemblyReference>Microsoft.VisualBasic.Core</AssemblyReference>
+      <AssemblyReference>System.Private.CoreLib</AssemblyReference>
+      <AssemblyReference>System</AssemblyReference>
+      <AssemblyReference>UiPath.System.Activities</AssemblyReference>
+    </scg:List>
+  </TextExpression.ReferencesForImplementation>
+  <Sequence DisplayName="Validate_Data" sap2010:WorkflowViewState.IdRef="Sequence_1">
+    <Sequence.Variables>
+      <Variable x:TypeArguments="s:DateTime" Name="dob" />
+      <Variable x:TypeArguments="x:Double" Name="salaryVal" />
+      <Variable x:TypeArguments="x:Boolean" Name="isDateValid" />
+    </Sequence.Variables>
+    <Assign DisplayName="Init Errors List" sap2010:WorkflowViewState.IdRef="Assign_1">
+      <Assign.To><OutArgument x:TypeArguments="scg:List(x:String)">[out_Errors]</OutArgument></Assign.To>
+      <Assign.Value><InArgument x:TypeArguments="scg:List(x:String)">[New List(Of String)]</InArgument></Assign.Value>
+    </Assign>
+    <Assign DisplayName="Init IsValid" sap2010:WorkflowViewState.IdRef="Assign_2">
+      <Assign.To><OutArgument x:TypeArguments="x:Boolean">[out_IsValid]</OutArgument></Assign.To>
+      <Assign.Value><InArgument x:TypeArguments="x:Boolean">[True]</InArgument></Assign.Value>
+    </Assign>
+
+    <!-- Validate Full Name -->
+    <If Condition="[Not in_EmployeeData.ContainsKey(&quot;full_name&quot;) OrElse String.IsNullOrWhiteSpace(in_EmployeeData(&quot;full_name&quot;))]" DisplayName="Check Full Name" sap2010:WorkflowViewState.IdRef="If_1">
+      <If.Then>
+        <AddToCollection x:TypeArguments="x:String" Collection="[out_Errors]" DisplayName="Add Full Name Error" Item="Full Name is required." sap2010:WorkflowViewState.IdRef="AddToCollection_1" />
+      </If.Then>
+    </If>
+
+    <!-- Validate Email -->
+    <If Condition="[Not in_EmployeeData.ContainsKey(&quot;email&quot;) OrElse Not System.Text.RegularExpressions.Regex.IsMatch(in_EmployeeData(&quot;email&quot;).Trim(), &quot;^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$&quot;)]" DisplayName="Check Email Format" sap2010:WorkflowViewState.IdRef="If_2">
+      <If.Then>
+        <AddToCollection x:TypeArguments="x:String" Collection="[out_Errors]" DisplayName="Add Email Error" Item="Valid email address is required." sap2010:WorkflowViewState.IdRef="AddToCollection_2" />
+      </If.Then>
+    </If>
+
+    <!-- Validate Department -->
+    <If Condition="[Not in_EmployeeData.ContainsKey(&quot;department&quot;) OrElse String.IsNullOrWhiteSpace(in_EmployeeData(&quot;department&quot;))]" DisplayName="Check Department" sap2010:WorkflowViewState.IdRef="If_3">
+      <If.Then>
+        <AddToCollection x:TypeArguments="x:String" Collection="[out_Errors]" DisplayName="Add Department Error" Item="Department is required." sap2010:WorkflowViewState.IdRef="AddToCollection_3" />
+      </If.Then>
+    </If>
+
+    <!-- Validate Designation -->
+    <If Condition="[Not in_EmployeeData.ContainsKey(&quot;designation&quot;) OrElse String.IsNullOrWhiteSpace(in_EmployeeData(&quot;designation&quot;))]" DisplayName="Check Designation" sap2010:WorkflowViewState.IdRef="If_4">
+      <If.Then>
+        <AddToCollection x:TypeArguments="x:String" Collection="[out_Errors]" DisplayName="Add Designation Error" Item="Designation is required." sap2010:WorkflowViewState.IdRef="AddToCollection_4" />
+      </If.Then>
+    </If>
+
+    <!-- Final Check -->
+    <If Condition="[out_Errors.Count &gt; 0]" DisplayName="Evaluate Final Validity" sap2010:WorkflowViewState.IdRef="If_5">
+      <If.Then>
+        <Assign sap2010:WorkflowViewState.IdRef="Assign_3">
+          <Assign.To><OutArgument x:TypeArguments="x:Boolean">[out_IsValid]</OutArgument></Assign.To>
+          <Assign.Value><InArgument x:TypeArguments="x:Boolean">[False]</InArgument></Assign.Value>
+        </Assign>
+      </If.Then>
+    </If>
+    <ui:LogMessage DisplayName="Log Validation Result" Level="Info" Message="[&quot;Validation complete. IsValid: &quot; + out_IsValid.ToString() + &quot;, Errors count: &quot; + out_Errors.Count.ToString()]" sap2010:WorkflowViewState.IdRef="LogMessage_1" />
+  </Sequence>
+</Activity>

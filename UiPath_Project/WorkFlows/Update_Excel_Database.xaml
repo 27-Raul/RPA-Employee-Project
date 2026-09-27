@@ -1,0 +1,99 @@
+<Activity mc:Ignorable="sap sap2010" x:Class="Update_Excel_Database" xmlns="http://schemas.microsoft.com/netfx/2009/xaml/activities" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:s="clr-namespace:System;assembly=System.Private.CoreLib" xmlns:sap="http://schemas.microsoft.com/netfx/2009/xaml/activities/presentation" xmlns:sap2010="http://schemas.microsoft.com/netfx/2010/xaml/activities/presentation" xmlns:scg="clr-namespace:System.Collections.Generic;assembly=System.Private.CoreLib" xmlns:sd="clr-namespace:System.Data;assembly=System.Data.Common" xmlns:ui="http://schemas.uipath.com/workflow/activities" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <x:Members>
+    <x:Property Name="in_DatabasePath" Type="InArgument(x:String)" />
+    <x:Property Name="in_EmployeeData" Type="InArgument(scg:Dictionary(x:String, x:String))" />
+    <x:Property Name="in_EmployeeID" Type="InArgument(x:String)" />
+    <x:Property Name="in_EmployeeFolder" Type="InArgument(x:String)" />
+    <x:Property Name="in_WelcomeLetterPath" Type="InArgument(x:String)" />
+    <x:Property Name="in_EmailStatus" Type="InArgument(x:String)" />
+    <x:Property Name="out_Success" Type="OutArgument(x:Boolean)" />
+  </x:Members>
+  <VisualBasic.Settings>
+    <x:Null />
+  </VisualBasic.Settings>
+  <sap2010:WorkflowViewState.IdRef>Update_Excel_Database_1</sap2010:WorkflowViewState.IdRef>
+  <TextExpression.NamespacesForImplementation>
+    <scg:List x:TypeArguments="x:String" Capacity="34">
+      <x:String>GlobalConstantsNamespace</x:String>
+      <x:String>GlobalVariablesNamespace</x:String>
+      <x:String>Microsoft.VisualBasic</x:String>
+      <x:String>Microsoft.VisualBasic.Activities</x:String>
+      <x:String>System</x:String>
+      <x:String>System.Activities</x:String>
+      <x:String>System.Activities.Statements</x:String>
+      <x:String>System.Collections</x:String>
+      <x:String>System.Collections.Generic</x:String>
+      <x:String>System.Collections.ObjectModel</x:String>
+      <x:String>System.Data</x:String>
+      <x:String>System.Linq</x:String>
+      <x:String>UiPath.Core</x:String>
+      <x:String>UiPath.Core.Activities</x:String>
+      <x:String>UiPath.Excel</x:String>
+      <x:String>UiPath.Excel.Activities</x:String>
+    </scg:List>
+  </TextExpression.NamespacesForImplementation>
+  <TextExpression.ReferencesForImplementation>
+    <scg:List x:TypeArguments="AssemblyReference" Capacity="34">
+      <AssemblyReference>System.Activities</AssemblyReference>
+      <AssemblyReference>Microsoft.VisualBasic</AssemblyReference>
+      <AssemblyReference>Microsoft.VisualBasic.Core</AssemblyReference>
+      <AssemblyReference>System.Private.CoreLib</AssemblyReference>
+      <AssemblyReference>System.Data</AssemblyReference>
+      <AssemblyReference>System.Data.Common</AssemblyReference>
+      <AssemblyReference>System</AssemblyReference>
+      <AssemblyReference>UiPath.System.Activities</AssemblyReference>
+      <AssemblyReference>UiPath.Excel.Activities</AssemblyReference>
+      <AssemblyReference>System.Linq</AssemblyReference>
+      <AssemblyReference>System.ObjectModel</AssemblyReference>
+      <AssemblyReference>System.ComponentModel.TypeConverter</AssemblyReference>
+    </scg:List>
+  </TextExpression.ReferencesForImplementation>
+  <Sequence DisplayName="Update_Excel_Database" sap2010:WorkflowViewState.IdRef="Sequence_1">
+    <Sequence.Variables>
+      <Variable x:TypeArguments="sd:DataTable" Name="dtNewRow" />
+    </Sequence.Variables>
+    <sap:WorkflowViewStateService.ViewState>
+      <scg:Dictionary x:TypeArguments="x:String, x:Object">
+        <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+      </scg:Dictionary>
+    </sap:WorkflowViewStateService.ViewState>
+    <TryCatch DisplayName="Try Update Excel" sap2010:WorkflowViewState.IdRef="TryCatch_1">
+      <TryCatch.Try>
+        <Sequence DisplayName="Append Record" sap2010:WorkflowViewState.IdRef="Sequence_2">
+          <ui:BuildDataTable DataTable="[dtNewRow]" DisplayName="Build Employee Row DataTable" sap2010:WorkflowViewState.IdRef="BuildDataTable_1" TableInfo="&lt;NewDataSet&gt;&#xA;  &lt;xs:schema id=&quot;NewDataSet&quot; xmlns=&quot;&quot; xmlns:xs=&quot;http://www.w3.org/2001/XMLSchema&quot; xmlns:msdata=&quot;urn:schemas-microsoft-com:xml-msdata&quot;&gt;&#xA;    &lt;xs:element name=&quot;NewDataSet&quot; msdata:IsDataSet=&quot;true&quot; msdata:MainSource=&quot;TableName&quot; msdata:UseCurrentLocale=&quot;true&quot;&gt;&#xA;      &lt;xs:complexType&gt;&#xA;        &lt;xs:choice minOccurs=&quot;0&quot; maxOccurs=&quot;unbounded&quot;&gt;&#xA;          &lt;xs:element name=&quot;TableName&quot;&gt;&#xA;            &lt;xs:complexType&gt;&#xA;              &lt;xs:sequence&gt;&#xA;                &lt;xs:element name=&quot;Employee_x0020_ID&quot; type=&quot;xs:string&quot; minOccurs=&quot;0&quot; /&gt;&#xA;                &lt;xs:element name=&quot;Full_x0020_Name&quot; type=&quot;xs:string&quot; minOccurs=&quot;0&quot; /&gt;&#xA;                &lt;xs:element name=&quot;Date_x0020_of_x0020_Birth&quot; type=&quot;xs:string&quot; minOccurs=&quot;0&quot; /&gt;&#xA;                &lt;xs:element name=&quot;Gender&quot; type=&quot;xs:string&quot; minOccurs=&quot;0&quot; /&gt;&#xA;                &lt;xs:element name=&quot;Email&quot; type=&quot;xs:string&quot; minOccurs=&quot;0&quot; /&gt;&#xA;                &lt;xs:element name=&quot;Phone&quot; type=&quot;xs:string&quot; minOccurs=&quot;0&quot; /&gt;&#xA;                &lt;xs:element name=&quot;Address&quot; type=&quot;xs:string&quot; minOccurs=&quot;0&quot; /&gt;&#xA;                &lt;xs:element name=&quot;Department&quot; type=&quot;xs:string&quot; minOccurs=&quot;0&quot; /&gt;&#xA;                &lt;xs:element name=&quot;Designation&quot; type=&quot;xs:string&quot; minOccurs=&quot;0&quot; /&gt;&#xA;                &lt;xs:element name=&quot;Date_x0020_of_x0020_Joining&quot; type=&quot;xs:string&quot; minOccurs=&quot;0&quot; /&gt;&#xA;                &lt;xs:element name=&quot;Salary&quot; type=&quot;xs:string&quot; minOccurs=&quot;0&quot; /&gt;&#xA;                &lt;xs:element name=&quot;Manager_x0020_Name&quot; type=&quot;xs:string&quot; minOccurs=&quot;0&quot; /&gt;&#xA;                &lt;xs:element name=&quot;Employment_x0020_Type&quot; type=&quot;xs:string&quot; minOccurs=&quot;0&quot; /&gt;&#xA;                &lt;xs:element name=&quot;Status&quot; type=&quot;xs:string&quot; minOccurs=&quot;0&quot; /&gt;&#xA;                &lt;xs:element name=&quot;Onboarding_x0020_Date&quot; type=&quot;xs:string&quot; minOccurs=&quot;0&quot; /&gt;&#xA;                &lt;xs:element name=&quot;Employee_x0020_Folder_x0020_Path&quot; type=&quot;xs:string&quot; minOccurs=&quot;0&quot; /&gt;&#xA;                &lt;xs:element name=&quot;Welcome_x0020_Letter_x0020_Path&quot; type=&quot;xs:string&quot; minOccurs=&quot;0&quot; /&gt;&#xA;                &lt;xs:element name=&quot;Email_x0020_Status&quot; type=&quot;xs:string&quot; minOccurs=&quot;0&quot; /&gt;&#xA;              &lt;/xs:sequence&gt;&#xA;            &lt;/xs:complexType&gt;&#xA;          &lt;/xs:element&gt;&#xA;        &lt;/xs:choice&gt;&#xA;      &lt;/xs:complexType&gt;&#xA;    &lt;/xs:element&gt;&#xA;  &lt;/xs:schema&gt;&#xA;&lt;/NewDataSet&gt;" />
+          <ui:AddDataRow DataRow="{x:Null}" ArrayRow="[{ &#xA;            in_EmployeeID, &#xA;            If(in_EmployeeData.ContainsKey(&quot;full_name&quot;), in_EmployeeData(&quot;full_name&quot;), &quot;&quot;), &#xA;            If(in_EmployeeData.ContainsKey(&quot;date_of_birth&quot;), in_EmployeeData(&quot;date_of_birth&quot;), &quot;&quot;), &#xA;            If(in_EmployeeData.ContainsKey(&quot;gender&quot;), in_EmployeeData(&quot;gender&quot;), &quot;&quot;), &#xA;            If(in_EmployeeData.ContainsKey(&quot;email&quot;), in_EmployeeData(&quot;email&quot;), &quot;&quot;), &#xA;            If(in_EmployeeData.ContainsKey(&quot;phone&quot;), in_EmployeeData(&quot;phone&quot;), &quot;&quot;), &#xA;            If(in_EmployeeData.ContainsKey(&quot;address&quot;), in_EmployeeData(&quot;address&quot;), &quot;&quot;), &#xA;            If(in_EmployeeData.ContainsKey(&quot;department&quot;), in_EmployeeData(&quot;department&quot;), &quot;&quot;), &#xA;            If(in_EmployeeData.ContainsKey(&quot;designation&quot;), in_EmployeeData(&quot;designation&quot;), &quot;&quot;), &#xA;            If(in_EmployeeData.ContainsKey(&quot;date_of_joining&quot;), in_EmployeeData(&quot;date_of_joining&quot;), &quot;&quot;), &#xA;            If(in_EmployeeData.ContainsKey(&quot;salary&quot;), in_EmployeeData(&quot;salary&quot;), &quot;&quot;), &#xA;            If(in_EmployeeData.ContainsKey(&quot;manager_name&quot;), in_EmployeeData(&quot;manager_name&quot;), &quot;&quot;), &#xA;            If(in_EmployeeData.ContainsKey(&quot;employment_type&quot;), in_EmployeeData(&quot;employment_type&quot;), &quot;&quot;), &#xA;            &quot;Onboarding Completed&quot;, &#xA;            DateTime.Now.ToString(&quot;yyyy-MM-dd HH:mm:ss&quot;), &#xA;            in_EmployeeFolder, &#xA;            in_WelcomeLetterPath, &#xA;            in_EmailStatus &#xA;          }]" DataTable="[dtNewRow]" DisplayName="Add Employee Row" sap2010:WorkflowViewState.IdRef="AddDataRow_1" />
+          <ui:AppendRange DataTable="[dtNewRow]" DisplayName="Append Range to Database" sap2010:WorkflowViewState.IdRef="AppendRange_1" SheetName="Employees" WorkbookPath="[in_DatabasePath]" />
+          <Assign sap2010:WorkflowViewState.IdRef="Assign_1">
+            <Assign.To>
+              <OutArgument x:TypeArguments="x:Boolean">[out_Success]</OutArgument>
+            </Assign.To>
+            <Assign.Value>
+              <InArgument x:TypeArguments="x:Boolean">[True]</InArgument>
+            </Assign.Value>
+          </Assign>
+          <ui:LogMessage DisplayName="Log DB Updated" sap2010:WorkflowViewState.IdRef="LogMessage_1" Level="Info" Message="[&quot;Database updated for employee: &quot; + in_EmployeeID]" />
+        </Sequence>
+      </TryCatch.Try>
+      <TryCatch.Catches>
+        <Catch x:TypeArguments="s:Exception" sap2010:WorkflowViewState.IdRef="Catch`1_1">
+          <ActivityAction x:TypeArguments="s:Exception">
+            <ActivityAction.Argument>
+              <DelegateInArgument x:TypeArguments="s:Exception" Name="ex" />
+            </ActivityAction.Argument>
+            <Sequence DisplayName="Handle DB Error" sap2010:WorkflowViewState.IdRef="Sequence_3">
+              <Assign sap2010:WorkflowViewState.IdRef="Assign_2">
+                <Assign.To>
+                  <OutArgument x:TypeArguments="x:Boolean">[out_Success]</OutArgument>
+                </Assign.To>
+                <Assign.Value>
+                  <InArgument x:TypeArguments="x:Boolean">[False]</InArgument>
+                </Assign.Value>
+              </Assign>
+              <ui:LogMessage DisplayName="Log DB Error" sap2010:WorkflowViewState.IdRef="LogMessage_2" Level="Error" Message="[&quot;Failed to update database: &quot; + ex.Message]" />
+            </Sequence>
+          </ActivityAction>
+        </Catch>
+      </TryCatch.Catches>
+    </TryCatch>
+  </Sequence>
+</Activity>

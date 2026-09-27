@@ -1,0 +1,112 @@
+<Activity mc:Ignorable="sap sap2010" x:Class="Initialize_Config" xmlns="http://schemas.microsoft.com/netfx/2009/xaml/activities" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:s="clr-namespace:System;assembly=System.Private.CoreLib" xmlns:sap="http://schemas.microsoft.com/netfx/2009/xaml/activities/presentation" xmlns:sap2010="http://schemas.microsoft.com/netfx/2010/xaml/activities/presentation" xmlns:scg="clr-namespace:System.Collections.Generic;assembly=System.Private.CoreLib" xmlns:sd="clr-namespace:System.Data;assembly=System.Data.Common" xmlns:ui="http://schemas.uipath.com/workflow/activities" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <x:Members>
+    <x:Property Name="in_ConfigFile" Type="InArgument(x:String)" />
+    <x:Property Name="out_Config" Type="OutArgument(scg:Dictionary(x:String, x:String))" />
+  </x:Members>
+  <VisualBasic.Settings>
+    <x:Null />
+  </VisualBasic.Settings>
+  <sap2010:WorkflowViewState.IdRef>Initialize_Config_1</sap2010:WorkflowViewState.IdRef>
+  <TextExpression.NamespacesForImplementation>
+    <scg:List x:TypeArguments="x:String" Capacity="34">
+      <x:String>GlobalConstantsNamespace</x:String>
+      <x:String>GlobalVariablesNamespace</x:String>
+      <x:String>Microsoft.VisualBasic</x:String>
+      <x:String>Microsoft.VisualBasic.Activities</x:String>
+      <x:String>System.Activities</x:String>
+      <x:String>System.Activities.Statements</x:String>
+      <x:String>System</x:String>
+      <x:String>System.Collections</x:String>
+      <x:String>System.Collections.Generic</x:String>
+      <x:String>System.Data</x:String>
+      <x:String>System.IO</x:String>
+      <x:String>UiPath.Core</x:String>
+      <x:String>UiPath.Core.Activities</x:String>
+      <x:String>UiPath.Excel</x:String>
+      <x:String>UiPath.Excel.Activities</x:String>
+    </scg:List>
+  </TextExpression.NamespacesForImplementation>
+  <TextExpression.ReferencesForImplementation>
+    <scg:List x:TypeArguments="AssemblyReference" Capacity="34">
+      <AssemblyReference>System.Activities</AssemblyReference>
+      <AssemblyReference>Microsoft.VisualBasic</AssemblyReference>
+      <AssemblyReference>Microsoft.VisualBasic.Core</AssemblyReference>
+      <AssemblyReference>System.Private.CoreLib</AssemblyReference>
+      <AssemblyReference>System.Data</AssemblyReference>
+      <AssemblyReference>System.Data.Common</AssemblyReference>
+      <AssemblyReference>System.Data.DataSetExtensions</AssemblyReference>
+      <AssemblyReference>System</AssemblyReference>
+      <AssemblyReference>UiPath.System.Activities</AssemblyReference>
+      <AssemblyReference>UiPath.Excel.Activities</AssemblyReference>
+      <AssemblyReference>UiPath.Excel</AssemblyReference>
+    </scg:List>
+  </TextExpression.ReferencesForImplementation>
+  <Sequence DisplayName="Initialize_Config" sap2010:WorkflowViewState.IdRef="Sequence_1">
+    <Sequence.Variables>
+      <Variable x:TypeArguments="sd:DataTable" Name="dtConfig" />
+      <Variable x:TypeArguments="x:Boolean" Name="configExists" />
+    </Sequence.Variables>
+    <Assign DisplayName="Initialize Dictionary" sap2010:WorkflowViewState.IdRef="Assign_1">
+      <Assign.To>
+        <OutArgument x:TypeArguments="scg:Dictionary(x:String, x:String)">[out_Config]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="scg:Dictionary(x:String, x:String)">[New Dictionary(Of String, String)]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <ui:FileExistsX DisplayName="Check Config File Exists" Exists="[configExists]" Path="[in_ConfigFile]" sap2010:WorkflowViewState.IdRef="FileExistsX_1" />
+    <If Condition="[configExists]" DisplayName="If Config Exists" sap2010:WorkflowViewState.IdRef="If_1">
+      <If.Then>
+        <Sequence DisplayName="Read Excel Config" sap2010:WorkflowViewState.IdRef="Sequence_2">
+          <ui:ReadRange Range="" AddHeaders="True" DataTable="[dtConfig]" DisplayName="Read Range Config Sheet" SheetName="Config" WorkbookPath="[in_ConfigFile]" sap2010:WorkflowViewState.IdRef="ReadRange_1" />
+          <ui:ForEachRow ColumnNames="{x:Null}" CurrentIndex="{x:Null}" DataTable="[dtConfig]" DisplayName="For Each Row in Config DataTable" sap2010:WorkflowViewState.IdRef="ForEachRow_1">
+            <ui:ForEachRow.Body>
+              <ActivityAction x:TypeArguments="sd:DataRow">
+                <ActivityAction.Argument>
+                  <DelegateInArgument x:TypeArguments="sd:DataRow" Name="row" />
+                </ActivityAction.Argument>
+                <If Condition="[Not String.IsNullOrWhiteSpace(row(&quot;Key&quot;).ToString())]" DisplayName="If Key is not empty" sap2010:WorkflowViewState.IdRef="If_2">
+                  <If.Then>
+                    <Assign DisplayName="Add Config Key-Value" sap2010:WorkflowViewState.IdRef="Assign_2">
+                      <Assign.To>
+                        <OutArgument x:TypeArguments="x:String">[out_Config(row("Key").ToString().Trim())]</OutArgument>
+                      </Assign.To>
+                      <Assign.Value>
+                        <InArgument x:TypeArguments="x:String">[If(row("Value") IsNot Nothing, row("Value").ToString().Trim(), "")]</InArgument>
+                      </Assign.Value>
+                    </Assign>
+                  </If.Then>
+                </If>
+              </ActivityAction>
+            </ui:ForEachRow.Body>
+          </ui:ForEachRow>
+        </Sequence>
+      </If.Then>
+      <If.Else>
+        <Sequence DisplayName="Default Fallback Config" sap2010:WorkflowViewState.IdRef="Sequence_3">
+          <Assign sap2010:WorkflowViewState.IdRef="Assign_3">
+            <Assign.To><OutArgument x:TypeArguments="x:String">[out_Config("CompanyName")]</OutArgument></Assign.To>
+            <Assign.Value><InArgument x:TypeArguments="x:String">["ABC Technologies"]</InArgument></Assign.Value>
+          </Assign>
+          <Assign sap2010:WorkflowViewState.IdRef="Assign_4">
+            <Assign.To><OutArgument x:TypeArguments="x:String">[out_Config("DatabasePath")]</OutArgument></Assign.To>
+            <Assign.Value><InArgument x:TypeArguments="x:String">["Database/EmployeeDatabase.xlsx"]</InArgument></Assign.Value>
+          </Assign>
+          <Assign sap2010:WorkflowViewState.IdRef="Assign_5">
+            <Assign.To><OutArgument x:TypeArguments="x:String">[out_Config("ErrorLogPath")]</OutArgument></Assign.To>
+            <Assign.Value><InArgument x:TypeArguments="x:String">["Logs/ErrorLog.xlsx"]</InArgument></Assign.Value>
+          </Assign>
+          <Assign sap2010:WorkflowViewState.IdRef="Assign_6">
+            <Assign.To><OutArgument x:TypeArguments="x:String">[out_Config("EmployeeRootFolder")]</OutArgument></Assign.To>
+            <Assign.Value><InArgument x:TypeArguments="x:String">["Employees"]</InArgument></Assign.Value>
+          </Assign>
+          <Assign sap2010:WorkflowViewState.IdRef="Assign_7">
+            <Assign.To><OutArgument x:TypeArguments="x:String">[out_Config("EmailMode")]</OutArgument></Assign.To>
+            <Assign.Value><InArgument x:TypeArguments="x:String">["mock"]</InArgument></Assign.Value>
+          </Assign>
+        </Sequence>
+      </If.Else>
+    </If>
+    <ui:LogMessage DisplayName="Log Config Loaded" Level="Info" Message="[&quot;Config initialized with &quot; + out_Config.Count.ToString() + &quot; entries.&quot;]" sap2010:WorkflowViewState.IdRef="LogMessage_1" />
+  </Sequence>
+</Activity>
