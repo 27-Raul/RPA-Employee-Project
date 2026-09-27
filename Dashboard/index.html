@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infosys HR Onboarding System | Enterprise Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="hidden">
+        <div class="spinner"></div>
+        <p id="loadingMsg">Processing RPA Workflow...</p>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer"></div>
+
+    <!-- Hidden File Input for Document Upload -->
+    <input type="file" id="globalFileInput" class="hidden" accept=".pdf,.png,.jpg,.jpeg,.doc,.docx">
+
+    <!-- Login Section -->
+    <div id="loginSection" class="login-wrapper">
+        <div class="login-card">
+            <h1 class="infosys-logo">Infosys</h1>
+            <p class="tagline">Navigate Your Next</p>
+            <h2 class="login-title">HR Onboarding Portal</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">Corporate Username</label>
+                    <input type="text" id="username" name="username" value="admin" required autocomplete="username">
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" value="admin123" required autocomplete="current-password">
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+                
+                <div class="quick-demo-accounts">
+                    <div class="quick-demo-title">⚡ Quick Sign-In (Demo Roles):</div>
+                    <div class="demo-btn-group">
+                        <button type="button" class="btn-demo" onclick="quickLogin('admin', 'admin123')">HR Admin</button>
+                        <button type="button" class="btn-demo" onclick="quickLogin('hr', 'hr123')">HR Staff</button>
+                        <button type="button" class="btn-demo" onclick="quickLogin('manager', 'manager123')">Manager</button>
+                        <button type="button" class="btn-demo" onclick="quickLogin('viewer', 'view123')">Viewer</button>
+                    </div>
+                </div>
+
+                <div class="hint">
+                    <strong>Role Access Matrix:</strong><br>
+                    • <b>HR Admin:</b> All features &amp; management<br>
+                    • <b>HR Staff:</b> Register &amp; onboard candidates, view salaries<br>
+                    • <b>Manager:</b> Review records &amp; verify onboarding docs (salaries hidden)<br>
+                    • <b>Viewer:</b> Read-only access (salaries hidden)
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Dashboard Section -->
+    <div id="mainSection" class="hidden dashboard-wrapper">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2 class="infosys-logo-sidebar">Infosys</h2>
+                <span class="sidebar-tagline">RPA HR PORTAL</span>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="active" data-section="dashboard">📊 Dashboard</li>
+                    <li data-section="register" id="navRegister">➕ Register Employee</li>
+                    <li data-section="excel-hub" id="navExcelHub">📑 Excel Data Hub</li>
+                    <li data-section="employee-list">👥 Employee List</li>
+                    <li data-section="documents">📁 Documents</li>
+                    <li data-section="assets">💻 Asset Tracker</li>
+                    <li data-section="reports">📋 Reports</li>
+                    <li data-section="audit">🔐 Audit Log</li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="sidebar-user-info" id="sidebarUserInfo">
+                    <strong id="userDisplayName">Admin User</strong>
+                    <span id="userRoleBadge" class="badge primary">HR Admin</span>
+                </div>
+                <button id="logoutBtn" class="btn btn-ghost btn-block" style="margin-top: 10px;">Logout</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-header">
+                <div class="header-title">
+                    <h1 id="sectionTitle">Dashboard</h1>
+                </div>
+                <div class="header-right">
+                    <span id="dateTimeDisplay" class="datetime-badge"></span>
+                    <div class="user-profile">
+                        <span class="status-indicator-dot online"></span>
+                        <span id="headerUserName">HR Administrator</span>
+                    </div>
+                </div>
+            </header>
+
+            <div class="content-area">
+                
+                <!-- Dashboard View -->
+                <section id="dashboard" class="content-section active">
+                    <div class="kpi-grid">
+                        <div class="kpi-card border-blue">
+                            <h3>Total Employees</h3>
+                            <p class="kpi-value" id="kpiTotal">0</p>
+                            <span class="kpi-sub">Across All Centers</span>
+                        </div>
+                        <div class="kpi-card border-green">
+                            <h3>Onboarding Completed</h3>
+                            <p class="kpi-value" id="kpiCompleted">0</p>
+                            <span class="kpi-sub">Verified &amp; Provisioned</span>
+                        </div>
+                        <div class="kpi-card border-orange">
+                            <h3>In Progress</h3>
+                            <p class="kpi-value" id="kpiProgress">0</p>
+                            <span class="kpi-sub">Pending Document/Review</span>
+                        </div>
+                        <div class="kpi-card border-purple">
+                            <h3>Offer Letters Sent</h3>
+                            <p class="kpi-value" id="kpiOffers">0</p>
+                            <span class="kpi-sub">Automated Email Dispatch</span>
+                        </div>
+                    </div>
+
+                    <div class="charts-grid">
+                        <div class="chart-container card">
+                            <h3>📈 Monthly Onboarding Trend</h3>
+                            <canvas id="monthlyChart" height="180"></canvas>
+                        </div>
+                        <div class="chart-container card">
+                            <h3>🏢 Headcount by Department</h3>
+                            <canvas id="deptChart" height="180"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="system-status-row">
+                        <div class="status-card card">
+                            <h4>🗄️ HR Database</h4>
+                            <span class="badge success" id="dbStatus">Active (Excel / OpenPyXL)</span>
+                        </div>
+                        <div class="status-card card">
+                            <h4>📧 Email Service Mode</h4>
+                            <span class="badge warning" id="emailMode">Mock Email Mode</span>
+                        </div>
+                        <div class="status-card card">
+                            <h4>⏱️ RPA Bot Engine</h4>
+                            <span class="badge success" id="rpaStatus">Online &amp; Ready</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Register Employee View -->
+                <section id="register" class="content-section hidden">
+                    <div class="card form-card">
+                        <div class="form-card-header">
+                            <h2>➕ Register &amp; Auto-Onboard Employee</h2>
+                            <p class="subtitle">Triggers the automated RPA sequence: validation, ID generation, folder creation, offer letter, welcome email, and asset kit provisioning.</p>
+                        </div>
+                        <div class="stepper">
+                            <div class="step active" id="stepIndicator1">1. Personal Information</div>
+                            <div class="step" id="stepIndicator2">2. Job &amp; Compensation</div>
+                            <div class="step" id="stepIndicator3">3. Review &amp; Launch Bot</div>
+                        </div>
+                        <form id="registerForm">
+                            <!-- Step 1 -->
+                            <div class="form-step" id="step1">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>First Name *</label>
+                                        <input type="text" id="regFName" placeholder="e.g. Priya" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Last Name *</label>
+                                        <input type="text" id="regLName" placeholder="e.g. Sharma" required>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Date of Birth * (Age &ge; 18)</label>
+                                        <input type="date" id="regDOB" value="1998-05-15" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Gender *</label>
+                                        <select id="regGender" required>
+                                            <option value="Female">Female</option>
+                                            <option value="Male">Male</option>
+                                            <option value="Other">Other</option>
+                                            <option value="Prefer not to say">Prefer not to say</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Personal Email *</label>
+                                        <input type="email" id="regEmail" placeholder="candidate@example.com" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Contact Phone *</label>
+                                        <input type="tel" id="regPhone" placeholder="e.g. 9876543210" required>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Permanent Residential Address</label>
+                                    <input type="text" id="regAddress" placeholder="e.g. 42 MG Road, Electronic City, Bangalore - 560100" value="Electronic City Phase 1, Bangalore - 560100">
+                                </div>
+                                <div class="form-actions">
+                                    <div></div>
+                                    <button type="button" class="btn btn-primary" onclick="nextStep(2)">Proceed to Job Details &rarr;</button>
+                                </div>
+                            </div>
+
+                            <!-- Step 2 -->
+                            <div class="form-step hidden" id="step2">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Department *</label>
+                                        <select id="regDept" required>
+                                            <option value="IT" selected>IT / Information Technology</option>
+                                            <option value="Engineering">Engineering</option>
+                                            <option value="HR">HR / Talent Acquisition</option>
+                                            <option value="Finance">Finance &amp; Accounts</option>
+                                            <option value="Marketing">Marketing</option>
+                                            <option value="Operations">Operations</option>
+                                            <option value="Sales">Sales</option>
+                                            <option value="Legal">Legal &amp; Compliance</option>
+                                            <option value="R&D">R&amp;D / Innovation Labs</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Designation / Job Role *</label>
+                                        <input type="text" id="regRole" placeholder="e.g. Systems Engineer" value="Systems Engineer" required>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Annual CTC (INR) *</label>
+                                        <input type="number" id="regCTC" placeholder="e.g. 850000" value="850000" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Date of Joining *</label>
+                                        <input type="date" id="regDOJ" required>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Employment Location *</label>
+                                        <select id="regLocation">
+                                            <option value="Bangalore" selected>Bangalore (Global HQ)</option>
+                                            <option value="Hyderabad">Hyderabad Development Center</option>
+                                            <option value="Pune">Pune Development Center</option>
+                                            <option value="Chennai">Chennai Development Center</option>
+                                            <option value="Mysore">Mysore Campus</option>
+                                            <option value="Bhubaneswar">Bhubaneswar Center</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Reporting Manager Name</label>
+                                        <input type="text" id="regManager" placeholder="e.g. Rahul Kumar" value="Rahul Kumar">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Employment Type *</label>
+                                        <select id="regEmpType">
+                                            <option value="Full-Time" selected>Full-Time Regular</option>
+                                            <option value="Contract">Contractual</option>
+                                            <option value="Intern">Internship</option>
+                                            <option value="Part-Time">Part-Time</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>RPA Execution Engine *</label>
+                                        <select id="regEngine">
+                                            <option value="uipath" selected>🤖 UiPath Workflow Engine (.xaml)</option>
+                                            <option value="python">🐍 Python RPA Orchestrator</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group checkbox-group highlight-box">
+                                    <input type="checkbox" id="regSendOffer" checked>
+                                    <label for="regSendOffer">
+                                        <strong>📨 Automatically Generate &amp; Send Offer Letter Email</strong>
+                                        <span class="help-text">The robot will compile a branded Offer Letter PDF and dispatch the offer email immediately upon registration.</span>
+                                    </label>
+                                </div>
+                                <div class="form-actions">
+                                    <button type="button" class="btn btn-ghost" onclick="nextStep(1)">&larr; Back</button>
+                                    <button type="button" class="btn btn-primary" onclick="nextStep(3)">Review &amp; Verify &rarr;</button>
+                                </div>
+                            </div>
+
+                            <!-- Step 3 -->
+                            <div class="form-step hidden" id="step3">
+                                <h3>📋 Review Candidate Details Before Launching RPA Robot</h3>
+                                <div id="reviewDetails" class="review-box"></div>
+                                <div class="highlight-notice">
+                                    <strong>🤖 Automated RPA Actions To Be Executed:</strong>
+                                    <ul>
+                                        <li>Validate all 12 HR parameters against policy</li>
+                                        <li>Generate sequential Employee ID (e.g. EMP005)</li>
+                                        <li>Create folder structure in <code>Employees/</code> directory</li>
+                                        <li>Generate customized <strong>Offer Letter PDF</strong> &amp; <strong>Welcome Letter PDF</strong></li>
+                                        <li>Auto-provision IT Hardware Kit (Laptop, Access Badge, Welcome Kit)</li>
+                                        <li>Dispatch official Welcome &amp; Offer Email</li>
+                                        <li>Persist record into Master Excel HR Database</li>
+                                    </ul>
+                                </div>
+                                <div class="form-actions">
+                                    <button type="button" class="btn btn-ghost" onclick="nextStep(2)">&larr; Edit Details</button>
+                                    <button type="submit" class="btn btn-success btn-lg">🚀 Launch RPA Onboarding Workflow</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+
+                <!-- Excel Data Hub View -->
+                <section id="excel-hub" class="content-section hidden">
+                    <div class="card">
+                        <div class="card-header-flex">
+                            <div>
+                                <h2>📑 Excel Data Hub &amp; Bulk Onboarding</h2>
+                                <p class="subtitle">Upload spreadsheets with employee details, run automated RPA batch onboarding, download templates, or export live records.</p>
+                            </div>
+                            <div class="header-btn-group" style="display: flex; gap: 8px;">
+                                <button class="btn btn-ghost btn-sm" onclick="downloadExcelTemplate()">📄 Download Sample Template</button>
+                                <button class="btn btn-primary btn-sm" onclick="exportEmployeesExcel()">📥 Export Database (.xlsx)</button>
+                            </div>
+                        </div>
+
+                        <!-- Hub Action Cards Grid -->
+                        <div class="excel-hub-grid">
+                            <div class="excel-action-card card">
+                                <div class="icon-circle bg-blue">📤</div>
+                                <h3>Bulk Excel Onboarding</h3>
+                                <p>Upload an Excel sheet containing candidate details to execute full RPA workflows sequentially.</p>
+                                <div class="upload-dropzone" id="excelDropzone" onclick="document.getElementById('excelFileInput').click()">
+                                    <input type="file" id="excelFileInput" class="hidden" accept=".xlsx,.xls,.csv" onchange="handleExcelFileSelected(event)">
+                                    <div class="dropzone-content">
+                                        <span class="dropzone-icon">📁</span>
+                                        <strong>Click to Browse or Drag &amp; Drop Excel</strong>
+                                        <span class="help-text">Supports .xlsx and .xls formats</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="excel-action-card card">
+                                <div class="icon-circle bg-green">📄</div>
+                                <h3>Sample Onboarding Template</h3>
+                                <p>Download a pre-formatted Excel template with verified columns, validation guidelines, and sample entries.</p>
+                                <button class="btn btn-ghost btn-block" style="margin-top: auto;" onclick="downloadExcelTemplate()">
+                                    ⬇️ Download Template (.xlsx)
+                                </button>
+                            </div>
+
+                            <div class="excel-action-card card">
+                                <div class="icon-circle bg-purple">📥</div>
+                                <h3>Master Database Export</h3>
+                                <p>Export the current live master employee database with all ID cards, folder paths, and onboarding statuses.</p>
+                                <button class="btn btn-primary btn-block" style="margin-top: auto;" onclick="exportEmployeesExcel()">
+                                    📊 Export Live Database
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Batch Candidate Preview Section -->
+                        <div id="excelPreviewContainer" class="hidden" style="margin-top: 2rem;">
+                            <div class="card-header-flex preview-header">
+                                <div>
+                                    <h3 id="previewTitle">📋 Candidate Batch Preview</h3>
+                                    <p id="previewSubtitle" class="subtitle">Review parsed employee records and validation checks before launching RPA sequence.</p>
+                                </div>
+                                <div class="preview-actions" style="display: flex; gap: 10px;">
+                                    <button class="btn btn-ghost" onclick="cancelExcelPreview()">Cancel</button>
+                                    <button class="btn btn-success btn-lg" id="btnLaunchBatch" onclick="launchBatchOnboarding()">
+                                        🚀 Launch Batch RPA Onboarding (<span id="batchCountBadge">0</span>)
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="kpi-grid" id="previewStatsGrid" style="margin: 1.25rem 0;">
+                                <div class="kpi-card border-blue">
+                                    <h3>Total Parsed</h3>
+                                    <p class="kpi-value" id="prevTotal">0</p>
+                                    <span class="kpi-sub">Rows in spreadsheet</span>
+                                </div>
+                                <div class="kpi-card border-green">
+                                    <h3>Valid Candidates</h3>
+                                    <p class="kpi-value" id="prevValid">0</p>
+                                    <span class="kpi-sub">Passed validation rules</span>
+                                </div>
+                                <div class="kpi-card border-orange">
+                                    <h3>Issues / Warnings</h3>
+                                    <p class="kpi-value" id="prevErrors">0</p>
+                                    <span class="kpi-sub">Duplicates or missing required fields</span>
+                                </div>
+                            </div>
+
+                            <div class="table-responsive">
+                                <table class="data-table" id="excelPreviewTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Row</th>
+                                            <th>Candidate Name</th>
+                                            <th>Email</th>
+                                            <th>Department</th>
+                                            <th>Designation</th>
+                                            <th>Joining Date</th>
+                                            <th>Annual CTC</th>
+                                            <th>Validation Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="excelPreviewTbody">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Batch Execution Results Section -->
+                        <div id="batchResultsContainer" class="hidden" style="margin-top: 2rem;">
+                            <div class="card-header-flex">
+                                <div>
+                                    <h3>🎉 Batch RPA Workflow Execution Summary</h3>
+                                    <p class="subtitle">All automated onboarding actions have been completed and stored in database.</p>
+                                </div>
+                                <button class="btn btn-primary btn-sm" onclick="showSection('employee-list')">View in Employee Directory &rarr;</button>
+                            </div>
+                            <div class="kpi-grid" id="batchResultKpis" style="margin: 1.25rem 0;"></div>
+                            <div class="table-responsive">
+                                <table class="data-table" id="batchResultsTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Employee ID</th>
+                                            <th>Full Name</th>
+                                            <th>Email</th>
+                                            <th>Department</th>
+                                            <th>Designation</th>
+                                            <th>Folder</th>
+                                            <th>Offer Letter</th>
+                                            <th>Assets</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="batchResultsTbody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+                <!-- Employee List View -->
+                <section id="employee-list" class="content-section hidden">
+                    <div class="card">
+                        <div class="card-header-flex">
+                            <h2>👥 Master Employee Directory</h2>
+                            <div style="display: flex; gap: 8px;">
+                                <button class="btn btn-ghost btn-sm" onclick="exportEmployeesExcel()">📥 Export to Excel</button>
+                                <button class="btn btn-primary btn-sm" id="btnBatchImport" onclick="openExcelHub()">📤 Batch Excel Import</button>
+                                <button class="btn btn-ghost btn-sm" onclick="loadEmployees()">↺ Refresh</button>
+                            </div>
+                        </div>
+                        <div class="table-header-actions">
+                            <input type="text" id="empSearch" placeholder="🔍 Search by ID, Name, or Email..." class="search-input">
+                            <select id="empDeptFilter" class="filter-select">
+                                <option value="">All Departments</option>
+                                <option value="IT">IT</option>
+                                <option value="Engineering">Engineering</option>
+                                <option value="HR">HR</option>
+                                <option value="Finance">Finance</option>
+                                <option value="Marketing">Marketing</option>
+                                <option value="Operations">Operations</option>
+                                <option value="Sales">Sales</option>
+                                <option value="R&D">R&amp;D</option>
+                            </select>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="data-table" id="empTable">
+                                <thead>
+                                    <tr>
+                                        <th>Employee ID</th>
+                                        <th>Full Name</th>
+                                        <th>Email Address</th>
+                                        <th>Department</th>
+                                        <th>Designation</th>
+                                        <th id="thSalary">Annual CTC</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td colspan="8" class="text-center">Loading employee records...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Documents View -->
+                <section id="documents" class="content-section hidden">
+                    <div class="card">
+                        <h2>📁 Employee Document Management &amp; Verification</h2>
+                        <p class="subtitle">Track submission and verify mandatory onboarding documents (Aadhaar, PAN, Degree, Relieving Letter, etc.)</p>
+                        
+                        <div class="table-header-actions" style="margin-top: 15px;">
+                            <select id="docEmployeeSelect" class="filter-select" style="min-width: 250px;">
+                                <option value="">-- Select Employee --</option>
+                            </select>
+                            <button class="btn btn-primary" onclick="loadDocumentChecklistForSelected()">Load Checklist</button>
+                        </div>
+
+                        <div id="docSummaryContainer" class="kpi-grid hidden" style="margin-top: 15px;"></div>
+
+                        <div id="docListContainer" style="margin-top: 20px;">
+                            <p class="empty-state">Please select an employee above to inspect and manage their document checklist.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Assets View -->
+                <section id="assets" class="content-section hidden">
+                    <div class="card">
+                        <div class="card-header-flex">
+                            <h2>💻 IT Asset Allocation Tracker</h2>
+                            <button class="btn btn-ghost btn-sm" onclick="loadAssets()">↺ Refresh Assets</button>
+                        </div>
+                        <p class="subtitle">Hardware, security credentials, and accessories auto-provisioned by the RPA bot during onboarding.</p>
+                        <div class="table-header-actions" style="margin-top: 15px;">
+                            <select id="assetTypeFilter" class="filter-select">
+                                <option value="">All Asset Types</option>
+                                <option value="Laptop">Laptop</option>
+                                <option value="Access Card">Access Card</option>
+                                <option value="Welcome Kit">Welcome Kit</option>
+                                <option value="Monitor">Monitor</option>
+                                <option value="Headset">Headset</option>
+                            </select>
+                            <select id="assetStatusFilter" class="filter-select">
+                                <option value="">All Statuses</option>
+                                <option value="Assigned">Assigned</option>
+                                <option value="Available">Available</option>
+                            </select>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="data-table" id="assetTable">
+                                <thead>
+                                    <tr>
+                                        <th>Asset ID</th>
+                                        <th>Asset Type</th>
+                                        <th>Hardware Serial No.</th>
+                                        <th>Assigned Employee</th>
+                                        <th>Allocation Date</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td colspan="6" class="text-center">Loading asset repository...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Reports View -->
+                <section id="reports" class="content-section hidden">
+                    <div class="card">
+                        <div class="card-header-flex">
+                            <h2>📋 Onboarding Compliance &amp; Executive Reports</h2>
+                            <button class="btn btn-primary" onclick="generateReport()">+ Generate New Excel Report</button>
+                        </div>
+                        <p class="subtitle">Comprehensive execution summaries formatted with KPI scorecards and itemized step audits.</p>
+                        
+                        <div id="reportSummary" class="kpi-grid hidden" style="margin: 20px 0;"></div>
+                        
+                        <div class="table-responsive">
+                            <table class="data-table" id="reportsTable">
+                                <thead>
+                                    <tr>
+                                        <th>Report File Name</th>
+                                        <th>Creation Date &amp; Timestamp</th>
+                                        <th>File Size</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td colspan="4" class="text-center">Loading reports catalog...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Audit Log View -->
+                <section id="audit" class="content-section hidden">
+                    <div class="card">
+                        <div class="card-header-flex">
+                            <h2>🔐 System Audit Trail Log</h2>
+                            <button class="btn btn-ghost btn-sm" onclick="loadAuditLog()">↺ Refresh Audit</button>
+                        </div>
+                        <p class="subtitle">Tamper-evident, chronological log of robotic workflow executions, document uploads, and security events.</p>
+                        <div class="table-responsive" style="margin-top: 15px;">
+                            <table class="data-table" id="auditTable">
+                                <thead>
+                                    <tr>
+                                        <th>Timestamp</th>
+                                        <th>Employee / Subject</th>
+                                        <th>Action Taken</th>
+                                        <th>Detailed Event Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td colspan="4" class="text-center">Loading audit events...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Employee Drawer Overlay -->
+    <div id="drawerOverlay" class="drawer-overlay hidden" onclick="closeDrawer()"></div>
+    <div id="employeeDrawer" class="drawer hidden">
+        <div class="drawer-header">
+            <div>
+                <h2 id="drawerEmpName">Employee Details</h2>
+                <span id="drawerEmpIdBadge" class="badge primary">EMP...</span>
+            </div>
+            <button class="btn-close" onclick="closeDrawer()">&times;</button>
+        </div>
+        <div class="drawer-content" id="drawerContent">
+            <p>Loading profile...</p>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
